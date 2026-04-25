@@ -1,0 +1,40 @@
+{
+  "title": "SMOKE TEST",
+  "samples": 4,
+  "labels": [
+    "benar",
+    "salah"
+  ],
+  "label_support": {
+    "benar": 2,
+    "salah": 2
+  },
+  "confusion_matrix": [
+    [
+      1,
+      1
+    ],
+    [
+      0,
+      2
+    ]
+  ],
+  "accuracy": 0.75,
+  "precision": 1.0,
+  "recall": 0.5,
+  "f1": 0.6666666666666666,
+  "y_true": [
+    "benar",
+    "benar",
+    "salah",
+    "salah"
+  ],
+  "y_pred": [
+    "benar",
+    "salah",
+    "salah",
+    "salah"
+  ],
+  "plot_generated": true,
+  "plot_status": "available"
+}

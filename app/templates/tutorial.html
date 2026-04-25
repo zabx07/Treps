@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>{% if exercise_type %}Tutorial {{ exercise_type|capitalize }}{% else %}Tutorial{% endif %} - Treps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#070707;
+    --panel:#121212;
+    --line:rgba(255,255,255,.08);
+    --text:#f3f3f3;
+    --muted:rgba(255,255,255,.58);
+    --accent:#e8192c;
+    --accent-soft:rgba(232,25,44,.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at top, rgba(232,25,44,.11), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Barlow',sans-serif;
+    padding:22px;
+  }
+  .shell{max-width:980px;margin:0 auto}
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    margin-bottom:36px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+  .mark{
+    width:34px;height:34px;border-radius:10px;background:var(--accent);
+    display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:18px;
+  }
+  .brand-text{font-family:'Bebas Neue';font-size:28px;letter-spacing:2px}
+  .nav-links{display:flex;gap:10px;flex-wrap:wrap}
+  .nav-links a{
+    padding:10px 14px;border-radius:999px;border:1px solid var(--line);
+    color:var(--muted);text-decoration:none;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
+  }
+  .nav-links a.active,.nav-links a:hover{color:var(--text);border-color:rgba(232,25,44,.3)}
+  .hero{
+    padding:26px;border-radius:24px;border:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    margin-bottom:20px;
+  }
+  .eyebrow{
+    display:inline-flex;padding:8px 12px;border-radius:999px;background:var(--accent-soft);
+    border:1px solid rgba(232,25,44,.26);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);
+    margin-bottom:16px;
+  }
+  h1{font-family:'Bebas Neue';font-size:clamp(40px,8vw,72px);letter-spacing:1.8px;line-height:.94;margin-bottom:10px}
+  .hero p{max-width:640px;font-size:15px;line-height:1.8;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}
+  .card{
+    border-radius:22px;border:1px solid var(--line);
+    background:rgba(255,255,255,.03);padding:22px;
+  }
+  .video-placeholder{
+    aspect-ratio:16/9;border-radius:18px;border:1px dashed rgba(255,255,255,.14);
+    background:rgba(255,255,255,.02);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+    color:var(--muted);margin-bottom:18px;
+  }
+  .video-placeholder .icon{
+    width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-soft);border:1px solid rgba(232,25,44,.3);font-size:26px;color:var(--accent);
+  }
+  .section-title{
+    font-size:12px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;
+  }
+  .steps{display:flex;flex-direction:column;gap:12px}
+  .step{
+    padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+  }
+  .step strong{display:block;margin-bottom:6px}
+  .step p{font-size:14px;line-height:1.7;color:var(--muted)}
+  .shortcut-grid{display:grid;gap:12px}
+  .shortcut{
+    padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);
+    text-decoration:none;color:inherit;
+  }
+  .shortcut h3{font-family:'Bebas Neue';font-size:28px;letter-spacing:1.5px;margin-bottom:8px}
+  .shortcut p{font-size:14px;line-height:1.7;color:var(--muted)}
+  .shortcut span{display:inline-block;margin-top:12px;font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase}
+  .start{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:180px;margin-top:18px;padding:14px 18px;border-radius:999px;
+    background:var(--accent);color:#fff;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+  }
+  @media(max-width:860px){
+    body{padding:18px}
+    .grid{grid-template-columns:1fr}
+    .nav{flex-direction:column;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="nav">
+    <a href="/" class="brand">
+      <div class="mark">T</div>
+      <div class="brand-text">TREPS</div>
+    </a>
+    <div class="nav-links">
+      <a href="/tutorial" class="{% if not exercise_type %}active{% endif %}">Tutorial</a>
+      <a href="/exercise/squat">Squat</a>
+      <a href="/exercise/push_up">Push-up</a>
+    </div>
+  </div>
+
+  {% if not exercise_type %}
+  <section class="hero">
+    <div class="eyebrow">Tutorial</div>
+    <h1>Belajar Gerakan yang Benar</h1>
+    <p>Halaman ini disiapkan untuk video tutorial resmi. Untuk saat ini, Treps menyediakan placeholder yang jelas dan panduan ringkas untuk squat dan push-up.</p>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <div class="video-placeholder">
+        <div class="icon">▶</div>
+        <div>Placeholder video tutorial</div>
+      </div>
+      <div class="section-title">Rencana isi tutorial</div>
+      <div class="steps">
+        <div class="step">
+          <strong>Demonstrasi bentuk benar</strong>
+          <p>Video final akan menampilkan posisi awal, fase turun, fase naik, dan sudut kamera samping yang ideal.</p>
+        </div>
+        <div class="step">
+          <strong>Kesalahan yang sering terjadi</strong>
+          <p>Setiap video akan menyorot contoh gerakan yang salah agar mudah dibandingkan saat evaluasi.</p>
+        </div>
+        <div class="step">
+          <strong>Setup kamera</strong>
+          <p>Treps paling stabil saat tubuh terlihat penuh dari samping, dengan pencahayaan cukup dan jarak yang konsisten.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="shortcut-grid">
+      <a href="/tutorial/squat" class="shortcut">
+        <h3>Squat</h3>
+        <p>Panduan posisi awal, kedalaman squat, dan hal yang perlu dijaga sebelum mulai evaluasi.</p>
+        <span>Buka panduan squat</span>
+      </a>
+      <a href="/tutorial/push_up" class="shortcut">
+        <h3>Push-up</h3>
+        <p>Panduan plank awal, kedalaman siku, dan body line yang perlu dijaga saat push-up.</p>
+        <span>Buka panduan push-up</span>
+      </a>
+    </div>
+  </section>
+  {% else %}
+  <section class="hero">
+    <div class="eyebrow">Tutorial {{ exercise_type|replace('_', '-') }}</div>
+    <h1>{% if exercise_type == 'squat' %}Squat{% else %}Push-up{% endif %}</h1>
+    <p>
+      {% if exercise_type == 'squat' %}
+      Mulai dari posisi berdiri tegak, turunkan pinggul ke belakang, dan jaga dada tetap terbuka sepanjang repetisi.
+      {% else %}
+      Mulai dari plank penuh, turunkan badan secara terkendali, lalu dorong kembali sambil menjaga tubuh tetap lurus.
+      {% endif %}
+    </p>
+    <a href="/exercise/{{ exercise_type }}" class="start">Mulai Evaluasi</a>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <div class="video-placeholder">
+        <div class="icon">▶</div>
+        <div>Video tutorial {{ exercise_type|capitalize }} belum ditambahkan</div>
+      </div>
+      <div class="section-title">Urutan singkat</div>
+      <div class="steps">
+        {% if exercise_type == 'squat' %}
+        <div class="step"><strong>1. Posisi awal</strong><p>Berdiri tegak, kaki selebar bahu, tubuh menyamping ke kamera.</p></div>
+        <div class="step"><strong>2. Fase turun</strong><p>Dorong pinggul ke belakang dan turunkan badan hingga cukup dalam.</p></div>
+        <div class="step"><strong>3. Fase naik</strong><p>Dorong dari tumit dan kembali ke posisi berdiri penuh sebelum repetisi berikutnya.</p></div>
+        {% else %}
+        <div class="step"><strong>1. Posisi awal</strong><p>Ambil plank penuh dari samping kamera sebelum repetisi pertama dimulai.</p></div>
+        <div class="step"><strong>2. Fase turun</strong><p>Tekuk siku dan turunkan badan sambil menjaga garis tubuh tetap lurus.</p></div>
+        <div class="step"><strong>3. Fase naik</strong><p>Dorong kembali ke posisi plank penuh agar repetisi dihitung stabil.</p></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Checklist sebelum mulai</div>
+      <div class="steps">
+        <div class="step"><strong>Kamera samping</strong><p>Treps menggunakan side view sebagai kondisi utama agar sudut gerakan lebih konsisten.</p></div>
+        <div class="step"><strong>Tubuh penuh terlihat</strong><p>Pastikan kepala, bahu, pinggul, lutut, dan kaki tidak keluar frame.</p></div>
+        <div class="step"><strong>Pencahayaan stabil</strong><p>Hindari backlight keras dan gunakan latar yang tidak terlalu ramai.</p></div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+</div>
+</body>
+</html>

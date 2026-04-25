@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Treps</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#070707;
+      --panel:#111111;
+      --panel-strong:#161616;
+      --line:rgba(255,255,255,.08);
+      --text:#f3f3f3;
+      --muted:rgba(255,255,255,.58);
+      --accent:#e8192c;
+      --accent-soft:rgba(232,25,44,.16);
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      min-height:100vh;
+      background:
+        radial-gradient(circle at top, rgba(232,25,44,.12), transparent 42%),
+        var(--bg);
+      color:var(--text);
+      font-family:'Barlow',sans-serif;
+      padding:24px;
+    }
+    .shell{max-width:980px;margin:0 auto}
+    .header{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      margin-bottom:56px;
+    }
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+    .brand-mark{
+      width:34px;height:34px;border-radius:10px;background:var(--accent);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Bebas Neue';font-size:18px;letter-spacing:1px;
+    }
+    .brand-text{font-family:'Bebas Neue';font-size:28px;letter-spacing:2px}
+    .header-note{
+      font-size:12px;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);
+    }
+    .hero{max-width:620px;margin-bottom:36px}
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;
+      background:var(--accent-soft);border:1px solid rgba(232,25,44,.26);
+      color:var(--accent);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+      margin-bottom:18px;
+    }
+    h1{
+      font-family:'Bebas Neue';font-size:clamp(50px,10vw,88px);
+      letter-spacing:2px;line-height:.92;margin-bottom:14px;
+    }
+    .hero p{
+      max-width:560px;font-size:15px;line-height:1.8;color:var(--muted);
+    }
+    .menu-grid{
+      display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:16px;
+    }
+    .menu-card{
+      min-height:230px;
+      padding:22px;
+      border-radius:24px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      text-decoration:none;color:inherit;
+      display:flex;flex-direction:column;justify-content:space-between;
+      transition:transform .2s ease,border-color .2s ease,background .2s ease;
+    }
+    .menu-card:hover{
+      transform:translateY(-4px);
+      border-color:rgba(232,25,44,.35);
+      background:linear-gradient(180deg, rgba(232,25,44,.12), rgba(255,255,255,.03));
+    }
+    .menu-icon{
+      width:52px;height:52px;border-radius:16px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(255,255,255,.06);
+      font-size:26px;
+    }
+    .menu-label{
+      font-family:'Bebas Neue';font-size:34px;letter-spacing:1.8px;margin-bottom:8px;
+    }
+    .menu-copy{
+      font-size:14px;line-height:1.7;color:var(--muted);max-width:250px;
+    }
+    .menu-cta{
+      font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--text);
+    }
+    @media(max-width:860px){
+      body{padding:18px}
+      .menu-grid{grid-template-columns:1fr}
+      .menu-card{min-height:180px}
+      .header{margin-bottom:40px}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="header">
+      <a href="/" class="brand">
+        <div class="brand-mark">T</div>
+        <div class="brand-text">TREPS</div>
+      </a>
+      <div class="header-note">Client-side pose tracking</div>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">Simple realtime exercise coach</div>
+      <h1>Treps</h1>
+      <p>
+        Pilih tutorial atau mulai evaluasi squat dan push-up langsung di browser.
+        Fokus utama aplikasi ini adalah repetisi yang stabil, feedback teknik dasar, dan alur yang mudah dipakai.
+      </p>
+    </section>
+
+    <section class="menu-grid" aria-label="Menu utama">
+      <a href="/tutorial" class="menu-card">
+        <div class="menu-icon">▶</div>
+        <div>
+          <div class="menu-label">Tutorial</div>
+          <div class="menu-copy">Panduan singkat gerakan yang benar. Video placeholder disiapkan agar bisa diisi nanti.</div>
+        </div>
+        <div class="menu-cta">Buka tutorial</div>
+      </a>
+
+      <a href="/exercise/squat" class="menu-card">
+        <div class="menu-icon">🦵</div>
+        <div>
+          <div class="menu-label">Squat</div>
+          <div class="menu-copy">Hitung repetisi squat, cek kedalaman, dan pantau koreksi teknik dasar secara realtime.</div>
+        </div>
+        <div class="menu-cta">Mulai squat</div>
+      </a>
+
+      <a href="/exercise/push_up" class="menu-card">
+        <div class="menu-icon">💪</div>
+        <div>
+          <div class="menu-label">Push-up</div>
+          <div class="menu-copy">Pantau repetisi push-up, stabilitas body line, dan ringkasan hasil latihan per sesi.</div>
+        </div>
+        <div class="menu-cta">Mulai push-up</div>
+      </a>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>{% if exercise_type == 'push_up' %}Push-up{% else %}Squat{% endif %} - Treps</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#070707;
+      --panel:#111111;
+      --panel-soft:#151515;
+      --line:rgba(255,255,255,.08);
+      --text:#f3f3f3;
+      --muted:rgba(255,255,255,.58);
+      --accent:#e8192c;
+      --accent-soft:rgba(232,25,44,.15);
+      --success:#54c470;
+      --warning:#ffbf47;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      min-height:100vh;
+      background:
+        radial-gradient(circle at top, rgba(232,25,44,.1), transparent 40%),
+        var(--bg);
+      color:var(--text);
+      font-family:'Barlow',sans-serif;
+      padding:20px;
+    }
+    .shell{max-width:1280px;margin:0 auto}
+    .nav{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      margin-bottom:18px;
+    }
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+    .mark{
+      width:34px;height:34px;border-radius:10px;background:var(--accent);
+      display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:18px;
+    }
+    .brand-text{font-family:'Bebas Neue';font-size:28px;letter-spacing:2px}
+    .nav-links{display:flex;gap:10px;flex-wrap:wrap}
+    .nav-links a{
+      padding:10px 14px;border-radius:999px;border:1px solid var(--line);
+      text-decoration:none;color:var(--muted);
+      font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+      transition:border-color .2s ease,color .2s ease,background .2s ease;
+    }
+    .nav-links a.active,.nav-links a:hover{
+      color:var(--text);border-color:rgba(232,25,44,.3);background:rgba(232,25,44,.08);
+    }
+    .hero{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+      margin-bottom:18px;
+    }
+    .eyebrow{
+      display:inline-flex;padding:8px 12px;border-radius:999px;background:var(--accent-soft);
+      border:1px solid rgba(232,25,44,.26);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);
+      margin-bottom:12px;
+    }
+    h1{font-family:'Bebas Neue';font-size:clamp(44px,7vw,74px);letter-spacing:1.8px;line-height:.94;margin-bottom:8px}
+    .hero-copy p{max-width:620px;color:var(--muted);font-size:15px;line-height:1.8}
+    .hero-note{
+      min-width:240px;padding:16px 18px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.03);
+      font-size:13px;line-height:1.7;color:var(--muted);
+    }
+    .layout{
+      display:grid;grid-template-columns:minmax(0, 1.45fr) minmax(340px, .9fr);gap:18px;
+    }
+    .card{
+      border-radius:24px;border:1px solid var(--line);background:rgba(255,255,255,.03);padding:18px;
+    }
+    .video-card{padding:14px}
+    .video-shell{
+      position:relative;border-radius:22px;overflow:hidden;background:#050505;aspect-ratio:16/10;
+      border:1px solid rgba(255,255,255,.06);
+    }
+    video,canvas{position:absolute;inset:0;width:100%;height:100%}
+    video{object-fit:cover;background:#040404}
+    canvas{pointer-events:none}
+    .badge-row{
+      position:absolute;left:14px;right:14px;top:14px;
+      display:flex;justify-content:space-between;gap:12px;z-index:5;
+    }
+    .badge{
+      padding:8px 12px;border-radius:999px;background:rgba(7,7,7,.8);
+      border:1px solid rgba(255,255,255,.08);font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;
+    }
+    .status-badge{color:var(--muted)}
+    .stats-grid{
+      display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:12px;margin-top:14px;
+    }
+    .stat{
+      padding:14px 16px;border-radius:18px;background:var(--panel);border:1px solid rgba(255,255,255,.05);
+    }
+    .stat-label{
+      font-size:11px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;
+    }
+    .stat-value{
+      font-family:'Bebas Neue';font-size:36px;letter-spacing:1.8px;line-height:1;color:var(--text);
+    }
+    .feedback-card{margin-top:14px;padding:16px 18px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:var(--panel)}
+    .feedback-card.success{border-color:rgba(84,196,112,.32);background:rgba(84,196,112,.08)}
+    .feedback-card.warning{border-color:rgba(255,191,71,.32);background:rgba(255,191,71,.08)}
+    .feedback-label{font-size:11px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+    .feedback-text{font-size:15px;line-height:1.7}
+    .sidebar{display:flex;flex-direction:column;gap:14px}
+    .section-title{
+      font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;
+    }
+    .mode-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+    .mode-card{
+      padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.06);background:var(--panel);
+      text-align:center;font-size:13px;font-weight:700;cursor:pointer;transition:border-color .2s ease,background .2s ease;
+    }
+    .mode-card.active{border-color:rgba(232,25,44,.34);background:rgba(232,25,44,.1)}
+    .rep-control{
+      display:grid;grid-template-columns:52px 1fr 52px;gap:10px;align-items:center;margin-bottom:14px;
+    }
+    .rep-control button,
+    .btn{
+      border:none;border-radius:16px;cursor:pointer;font-family:'Barlow',sans-serif;
+      transition:transform .2s ease,background .2s ease,border-color .2s ease,color .2s ease;
+    }
+    .rep-control button{
+      height:48px;background:rgba(255,255,255,.08);color:var(--text);font-size:24px;font-weight:700;
+    }
+    .rep-value{
+      height:48px;border-radius:16px;border:1px solid rgba(255,255,255,.06);background:var(--panel);
+      display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:30px;letter-spacing:1.8px;
+    }
+    .btn-group{display:grid;gap:10px}
+    .btn{
+      padding:14px 16px;font-size:13px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+    }
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.08)}
+    .btn-danger{background:rgba(255,255,255,.06);color:var(--warning);border:1px solid rgba(255,191,71,.24)}
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    .btn:not(:disabled):hover,.rep-control button:hover{transform:translateY(-1px)}
+    .info-grid{display:grid;gap:10px}
+    .info-row{
+      display:flex;justify-content:space-between;gap:14px;font-size:13px;padding:12px 0;border-top:1px solid rgba(255,255,255,.05);
+    }
+    .info-row:first-child{border-top:none;padding-top:0}
+    .info-label{color:var(--muted)}
+    .info-value{text-align:right;font-weight:600}
+    .progress-bar{
+      width:100%;height:10px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:10px;
+    }
+    .progress-fill{
+      height:100%;width:0%;background:linear-gradient(90deg, var(--accent), #ff4d5f);transition:width .2s ease;
+    }
+    .hint{
+      margin-top:12px;font-size:13px;line-height:1.7;color:var(--muted);
+    }
+    .history-list{display:grid;gap:10px}
+    .history-item{
+      width:100%;padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.06);background:var(--panel);
+      text-align:left;color:inherit;cursor:pointer;
+    }
+    .history-item.active{border-color:rgba(232,25,44,.34);background:rgba(232,25,44,.08)}
+    .history-item-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px}
+    .history-item-title{font-size:13px;font-weight:700}
+    .history-item-time{font-size:11px;color:var(--muted)}
+    .history-item-copy{font-size:13px;line-height:1.6;color:var(--muted)}
+    .history-empty{font-size:14px;line-height:1.7;color:var(--muted)}
+    .detail-grid{display:grid;gap:10px}
+    .detail-row{
+      display:flex;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05);font-size:13px;
+    }
+    .detail-row:first-child{border-top:none;padding-top:0}
+    .detail-label{color:var(--muted)}
+    .detail-value{text-align:right;font-weight:600}
+    .detail-copy{font-size:14px;line-height:1.8;color:var(--muted)}
+    input[type=file]{display:none}
+    @media(max-width:1100px){
+      .layout{grid-template-columns:1fr}
+      .stats-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+    }
+    @media(max-width:720px){
+      body{padding:14px}
+      .nav,.hero{flex-direction:column;align-items:flex-start}
+      .stats-grid{grid-template-columns:1fr 1fr}
+      .badge-row{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="nav">
+      <a href="/" class="brand">
+        <div class="mark">T</div>
+        <div class="brand-text">TREPS</div>
+      </a>
+      <div class="nav-links">
+        <a href="/tutorial" class="">Tutorial</a>
+        <a href="/exercise/squat" class="{% if exercise_type == 'squat' %}active{% endif %}">Squat</a>
+        <a href="/exercise/push_up" class="{% if exercise_type == 'push_up' %}active{% endif %}">Push-up</a>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">{% if exercise_type == 'push_up' %}Push-up{% else %}Squat{% endif %}</div>
+        <h1>{% if exercise_type == 'push_up' %}Push-up{% else %}Squat{% endif %}</h1>
+        <p>Gunakan kamera samping atau upload video. Treps menghitung repetisi pada siklus penuh, memberi koreksi teknik dasar, dan menyimpan histori sesi di browser.</p>
+      </div>
+      <div class="hero-note" id="deviceNote">Memuat preset device dan runtime browser.</div>
+    </div>
+
+    <div class="layout">
+      <div>
+        <div class="card video-card">
+          <div class="video-shell">
+            <video id="video" autoplay playsinline muted></video>
+            <canvas id="overlayCanvas"></canvas>
+            <div class="badge-row">
+              <div class="badge" id="runtimeBadge">Client Runtime</div>
+              <div class="badge status-badge" id="sourceStatusBadge">Menunggu sumber input</div>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat">
+              <div class="stat-label">Reps</div>
+              <div class="stat-value" id="repCount">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Stage</div>
+              <div class="stat-value" id="stageValue">-</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Status</div>
+              <div class="stat-value" id="statusValue">-</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Timer</div>
+              <div class="stat-value" id="timer">0:00</div>
+            </div>
+          </div>
+
+          <div class="feedback-card" id="feedbackCard">
+            <div class="feedback-label">Feedback</div>
+            <div class="feedback-text" id="feedback">Pilih kamera atau upload video untuk memulai.</div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <section class="card">
+          <div class="section-title">Sumber analisis</div>
+          <div class="mode-row">
+            <button type="button" id="cameraMode" class="mode-card active">Kamera</button>
+            <button type="button" id="uploadMode" class="mode-card">Upload</button>
+          </div>
+
+          <div class="section-title">Target repetisi</div>
+          <div class="rep-control">
+            <button type="button" id="decreaseRepsBtn">-</button>
+            <div class="rep-value" id="repValue">10</div>
+            <button type="button" id="increaseRepsBtn">+</button>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn btn-secondary" id="requestCameraBtn">Izinkan Kamera</button>
+            <button class="btn btn-secondary" id="uploadBtn">Pilih Video</button>
+            <button class="btn btn-primary" id="startBtn" disabled>Mulai Sesi</button>
+            <button class="btn btn-secondary" id="stopBtn" disabled>Stop</button>
+            <button class="btn btn-danger" id="resetBtn">Reset</button>
+          </div>
+
+          <div class="hint" id="uploadHint">Untuk upload, gunakan MP4/MOV/WebM dan side view. Jika browser tidak kuat, Treps akan mencoba batch fallback backend untuk file tersebut.</div>
+          <input type="file" id="videoFile" accept="video/mp4,video/quicktime,video/webm,video/*">
+        </section>
+
+        <section class="card">
+          <div class="section-title">Ringkasan sesi</div>
+          <div class="info-grid">
+            <div class="info-row"><span class="info-label">Target</span><span class="info-value" id="targetReps">10</span></div>
+            <div class="info-row"><span class="info-label">Sudut utama</span><span class="info-value" id="angleValue">-</span></div>
+            <div class="info-row"><span class="info-label">Reps benar</span><span class="info-value" id="goodRepsValue">0</span></div>
+            <div class="info-row"><span class="info-label">Perlu koreksi</span><span class="info-value" id="badRepsValue">0</span></div>
+            <div class="info-row"><span class="info-label">Preset</span><span class="info-value" id="presetValue">-</span></div>
+            <div class="info-row"><span class="info-label">Sumber</span><span class="info-value" id="modeStatusValue">Kamera</span></div>
+            <div class="info-row"><span class="info-label">Progress source</span><span class="info-value" id="sourceProgressValue">-</span></div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">Histori sesi</div>
+          <div class="history-list" id="historyList"></div>
+          <div class="history-empty" id="historyEmpty">Belum ada sesi tersimpan di browser ini.</div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">Detail sesi</div>
+          <div id="historyDetail" class="detail-copy">Pilih salah satu sesi pada histori untuk melihat detail hasil evaluasinya.</div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    window.TREPS_RUNTIME_BOOTSTRAP = {{ runtime_config|tojson }};
+  </script>
+  <script type="module" src="{{ url_for('static', filename='js/exercise-runtime.js') }}"></script>
+</body>
+</html>

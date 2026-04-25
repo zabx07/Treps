@@ -1,0 +1,186 @@
+{
+  "total_videos": 125,
+  "counts_by_exercise": {
+    "push_up": 38,
+    "squat": 87
+  },
+  "counts_by_label": {
+    "push_up:benar": 17,
+    "push_up:salah": 17,
+    "push_up:unlabeled": 4,
+    "squat:benar": 42,
+    "squat:salah": 41,
+    "squat:unlabeled": 4
+  },
+  "counts_by_error_tag": {
+    "push_up:badan_bungkuk": 6,
+    "push_up:tidak_full_rom": 6,
+    "push_up:traps_naik": 5,
+    "squat:badan_bungkuk": 9,
+    "squat:kaki_jinjit": 9,
+    "squat:lutut_maju": 10,
+    "squat:tidak_full_rom": 13
+  },
+  "metadata_missing_counts": {
+    "expected_reps": 125,
+    "subject_id": 125,
+    "camera_view": 125,
+    "occlusion_level": 125,
+    "split": 125,
+    "notes": 125,
+    "clip_source": 60,
+    "source_video": 109
+  },
+  "issue_flag_counts": {
+    "basename_conflict": 8,
+    "duplicate_hash": 6,
+    "split_group_multi_label": 26,
+    "unlabeled": 8
+  },
+  "unlabeled_root_files": [
+    "dataset/Pushup/ps.mp4",
+    "dataset/Pushup/psmix1.mp4",
+    "dataset/Pushup/psmix2.mp4",
+    "dataset/Pushup/push up.mp4",
+    "dataset/Squat/p11.mp4",
+    "dataset/Squat/sq_mix1.mp4",
+    "dataset/Squat/sq_mix2.mp4",
+    "dataset/Squat/squat_part_1.mp4"
+  ],
+  "duplicate_hashes": {
+    "db0f926b981a57c7172a25c97e6da6c17813e85b46052f5e4b26561f2536d7ff": [
+      "dataset/Squat/gerakan_benar/squat_15.mp4",
+      "dataset/Squat/gerakan_benar/squat_6.mp4"
+    ],
+    "b9783cba7174246884865b903d78c2c2d279528a0b2be03d95a25a529b4c7b1d": [
+      "dataset/Squat/gerakan_benar/squat_17.mp4",
+      "dataset/Squat/gerakan_benar/squat_8.mp4"
+    ],
+    "40b264e6f9e95791451e984c41dece29216997b4d219d304409d340db9025c31": [
+      "dataset/Squat/gerakan_benar/squat_part_1.mp4",
+      "dataset/Squat/squat_part_1.mp4"
+    ]
+  },
+  "duplicate_or_conflicting_basenames": {
+    "squat_9_part_2.mp4": [
+      "dataset/Squat/gerakan_benar/squat_9_part_2.mp4",
+      "dataset/Squat/gerakan_salah/tidak_full_rom/squat_9_part_2.mp4"
+    ],
+    "squat_9_part_3.mp4": [
+      "dataset/Squat/gerakan_benar/squat_9_part_3.mp4",
+      "dataset/Squat/gerakan_salah/tidak_full_rom/squat_9_part_3.mp4"
+    ],
+    "squat_part_1.mp4": [
+      "dataset/Squat/gerakan_benar/squat_part_1.mp4",
+      "dataset/Squat/squat_part_1.mp4"
+    ],
+    "p1_part_2.mp4": [
+      "dataset/Squat/gerakan_salah/lutut_maju/p1_part_2.mp4",
+      "dataset/Squat/gerakan_salah/tidak_full_rom/p1_part_2.mp4"
+    ]
+  },
+  "split_group_multi_label_conflicts": {
+    "push_up:psmix1": [
+      [
+        "benar",
+        ""
+      ],
+      [
+        "salah",
+        "badan_bungkuk"
+      ],
+      [
+        "unlabeled",
+        ""
+      ]
+    ],
+    "push_up:psmix2": [
+      [
+        "benar",
+        ""
+      ],
+      [
+        "salah",
+        "tidak_full_rom"
+      ],
+      [
+        "unlabeled",
+        ""
+      ]
+    ],
+    "squat:squat_9": [
+      [
+        "benar",
+        ""
+      ],
+      [
+        "salah",
+        "tidak_full_rom"
+      ]
+    ],
+    "squat:videoplayback (1)": [
+      [
+        "salah",
+        "badan_bungkuk"
+      ],
+      [
+        "salah",
+        "lutut_maju"
+      ]
+    ],
+    "squat:p11": [
+      [
+        "salah",
+        "kaki_jinjit"
+      ],
+      [
+        "salah",
+        "tidak_full_rom"
+      ],
+      [
+        "unlabeled",
+        ""
+      ]
+    ],
+    "squat:p1": [
+      [
+        "salah",
+        "kaki_jinjit"
+      ],
+      [
+        "salah",
+        "lutut_maju"
+      ],
+      [
+        "salah",
+        "tidak_full_rom"
+      ]
+    ]
+  },
+  "validation": {
+    "missing_files": [],
+    "missing_required_fields": {},
+    "invalid_expected_reps": [],
+    "invalid_label_main": [],
+    "invalid_exercise_type": []
+  },
+  "ground_truth_gaps": {
+    "expected_reps": "UNKNOWN: field tersedia di manifest, tetapi belum terisi dari dataset saat ini.",
+    "subject_id": "UNKNOWN: tidak bisa diinfer aman dari nama file/folder saat ini.",
+    "camera_view": "UNKNOWN: tidak ada metadata view eksplisit di dataset saat ini.",
+    "occlusion_level": "UNKNOWN: tidak ada anotasi occlusion eksplisit di dataset saat ini.",
+    "split": "UNKNOWN: belum ada split evaluasi/train-val-test yang sehat dan eksplisit.",
+    "phase_labels": "UNKNOWN: belum ada ground truth fase per frame/per event."
+  },
+  "custom_model_readiness": {
+    "ready_for_rule_evaluation": true,
+    "ready_for_rep_count_benchmark": false,
+    "ready_for_phase_model_training": false,
+    "blocking_factors": [
+      "expected_reps belum terisi",
+      "subject_id belum ada",
+      "split belum ada",
+      "phase/event annotation belum ada"
+    ]
+  }
+}

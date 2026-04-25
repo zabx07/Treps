@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>About – Treps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root{--red:#E8192C;--dark:#080808;--dark2:#111;--white:#f5f5f5;--gray:#666}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--dark);color:var(--white);font-family:'Barlow',sans-serif}
+  nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 20px;background:rgba(8,8,8,.95);
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+  .logo-icon{width:32px;height:32px;background:var(--red);
+    clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+    display:flex;align-items:center;justify-content:center;}
+  .logo-icon span{font-family:'Bebas Neue';font-size:13px;color:#fff}
+  .logo-text{font-family:'Bebas Neue';font-size:22px;letter-spacing:2px}
+  .home-btn{
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    color:var(--white);padding:8px 16px;border-radius:30px;
+    font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+    cursor:pointer;text-decoration:none;transition:all .2s;
+  }
+  .home-btn:hover{background:rgba(255,255,255,.15)}
+  .content{padding:48px 24px;max-width:500px}
+  h1{font-family:'Bebas Neue';font-size:52px;letter-spacing:2px;margin-bottom:16px}
+  h1 span{color:var(--red)}
+  p{font-size:15px;color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:20px}
+  .tech-list{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+  .tech-list li{
+    display:flex;align-items:center;gap:12px;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+    border-radius:12px;padding:14px 16px;font-size:14px;
+  }
+  .tech-list li span:first-child{font-size:22px}
+  a.btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:14px 28px;border-radius:50px;background:var(--red);
+    color:#fff;font-size:14px;font-weight:700;letter-spacing:1px;
+    text-transform:uppercase;text-decoration:none;
+  }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo">
+    <div class="logo-icon"><span>T</span></div>
+    <div class="logo-text">TREPS</div>
+  </a>
+  <a href="/" class="home-btn">🏠 Home</a>
+</nav>
+<div class="content">
+  <h1>About <span>Treps</span></h1>
+  <p>Treps adalah aplikasi fitness berbasis AI yang menggunakan computer vision untuk mendeteksi dan menganalisis gerakan latihanmu secara real-time langsung dari browser.</p>
+  <p>Tidak perlu perangkat khusus — cukup kamera laptop atau smartphone, dan Treps siap menjadi personal trainer digitalmu.</p>
+  <ul class="tech-list">
+    <li><span>🤖</span><span>MediaPipe Pose Detection</span></li>
+    <li><span>👁️</span><span>OpenCV Computer Vision</span></li>
+    <li><span>🐍</span><span>Python + Flask Backend</span></li>
+    <li><span>📊</span><span>Real-time Form Analysis</span></li>
+  </ul>
+  <a class="btn" href="/">← Kembali ke Beranda</a>
+</div>
+</body>
+</html>

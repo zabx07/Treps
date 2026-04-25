@@ -118,6 +118,7 @@
     .rep-control{
       display:grid;grid-template-columns:52px 1fr 52px;gap:10px;align-items:center;margin-bottom:14px;
     }
+    .rep-control.disabled{opacity:.55}
     .rep-control button,
     .btn{
       border:none;border-radius:16px;cursor:pointer;font-family:'Barlow',sans-serif;
@@ -172,8 +173,27 @@
     }
     .detail-row:first-child{border-top:none;padding-top:0}
     .detail-label{color:var(--muted)}
-    .detail-value{text-align:right;font-weight:600}
+    .detail-value{text-align:right;font-weight:600;color:var(--text);word-break:break-word}
     .detail-copy{font-size:14px;line-height:1.8;color:var(--muted)}
+    .detail-subtitle{
+      margin-top:14px;margin-bottom:10px;font-size:11px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);
+    }
+    .rep-list{display:grid;gap:10px}
+    .rep-item{
+      padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.06);background:var(--panel);
+    }
+    .rep-item-top{
+      display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px;
+    }
+    .rep-item-title{font-size:13px;font-weight:700;color:var(--text)}
+    .rep-item-copy{font-size:13px;line-height:1.6;color:var(--muted)}
+    .rep-chip{
+      display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;
+      font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;border:1px solid transparent;
+    }
+    .rep-chip.success{color:var(--success);border-color:rgba(84,196,112,.28);background:rgba(84,196,112,.1)}
+    .rep-chip.warning{color:var(--warning);border-color:rgba(255,191,71,.28);background:rgba(255,191,71,.1)}
+    .rep-empty{font-size:13px;line-height:1.7;color:var(--muted)}
     input[type=file]{display:none}
     @media(max-width:1100px){
       .layout{grid-template-columns:1fr}
@@ -184,6 +204,8 @@
       .nav,.hero{flex-direction:column;align-items:flex-start}
       .stats-grid{grid-template-columns:1fr 1fr}
       .badge-row{flex-direction:column;align-items:flex-start}
+      .rep-item-top,.detail-row,.info-row{flex-direction:column;align-items:flex-start}
+      .detail-value,.info-value{text-align:left}
     }
   </style>
 </head>
@@ -236,7 +258,7 @@
               <div class="stat-value" id="statusValue">-</div>
             </div>
             <div class="stat">
-              <div class="stat-label">Timer</div>
+              <div class="stat-label" id="timerLabel">Timer</div>
               <div class="stat-value" id="timer">0:00</div>
             </div>
           </div>
@@ -257,7 +279,7 @@
           </div>
 
           <div class="section-title">Target repetisi</div>
-          <div class="rep-control">
+          <div class="rep-control" id="repControl">
             <button type="button" id="decreaseRepsBtn">-</button>
             <div class="rep-value" id="repValue">10</div>
             <button type="button" id="increaseRepsBtn">+</button>
@@ -278,7 +300,7 @@
         <section class="card">
           <div class="section-title">Ringkasan sesi</div>
           <div class="info-grid">
-            <div class="info-row"><span class="info-label">Target</span><span class="info-value" id="targetReps">10</span></div>
+            <div class="info-row"><span class="info-label" id="targetLabel">Target</span><span class="info-value" id="targetReps">10</span></div>
             <div class="info-row"><span class="info-label">Sudut utama</span><span class="info-value" id="angleValue">-</span></div>
             <div class="info-row"><span class="info-label">Reps benar</span><span class="info-value" id="goodRepsValue">0</span></div>
             <div class="info-row"><span class="info-label">Perlu koreksi</span><span class="info-value" id="badRepsValue">0</span></div>
@@ -289,6 +311,11 @@
           <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
           </div>
+        </section>
+
+        <section class="card">
+          <div class="section-title">Detail repetisi aktif</div>
+          <div id="currentRepDetails" class="detail-copy">Belum ada repetisi yang selesai dievaluasi pada sesi ini.</div>
         </section>
 
         <section class="card">

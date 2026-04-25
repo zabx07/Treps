@@ -1,3 +1,4 @@
+import argparse
 import cv2
 import sys
 from pathlib import Path
@@ -7,9 +8,6 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from core.engine import ExerciseSession
-
-
-MAX_REPS = 14
 
 
 def draw_status(frame, result):
@@ -28,15 +26,38 @@ def draw_status(frame, result):
             (255, 255, 255),
             2,
         )
+    y = 215
+    for rep in result.get("history", [])[-3:]:
+        detail = rep.get("detail", "-")
+        cv2.putText(
+            frame,
+            f"Rep {rep['rep']}: {detail}",
+            (10, y),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            (255, 255, 255),
+            1,
+        )
+        y += 24
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Run squat detection from webcam without website.")
+    parser.add_argument("--camera", type=int, default=0, help="Camera index. Default: 0")
+    parser.add_argument("--target-reps", type=int, default=14, help="Target reps for live session.")
+    parser.add_argument("--width", type=int, default=640, help="Capture width.")
+    parser.add_argument("--height", type=int, default=480, help="Capture height.")
+    return parser.parse_args()
 
 
 def main():
+    args = parse_args()
     session = ExerciseSession("squat")
-    session.reset(target_reps=MAX_REPS)
+    session.reset(target_reps=args.target_reps)
 
-    cap = cv2.VideoCapture(0)
-    cap.set(3, 640)
-    cap.set(4, 480)
+    cap = cv2.VideoCapture(args.camera)
+    cap.set(3, args.width)
+    cap.set(4, args.height)
 
     if not cap.isOpened():
         raise RuntimeError("Kamera tidak terbuka")

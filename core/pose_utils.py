@@ -23,6 +23,8 @@ LANDMARK_INDEX = {
     "right_knee": POSE_LANDMARK.RIGHT_KNEE.value,
     "left_ankle": POSE_LANDMARK.LEFT_ANKLE.value,
     "right_ankle": POSE_LANDMARK.RIGHT_ANKLE.value,
+    "left_heel": POSE_LANDMARK.LEFT_HEEL.value,
+    "right_heel": POSE_LANDMARK.RIGHT_HEEL.value,
     "left_ear": POSE_LANDMARK.LEFT_EAR.value,
     "right_ear": POSE_LANDMARK.RIGHT_EAR.value,
     "left_foot_index": POSE_LANDMARK.LEFT_FOOT_INDEX.value,
@@ -59,6 +61,7 @@ def select_body_side(
     optional_point_names: list[str] | None = None,
     preferred_side: str | None = None,
     side_switch_margin: float = 0.08,
+    min_point_visibility: float | None = None,
 ) -> SideLandmarks | None:
     optional_point_names = optional_point_names or []
     candidates: list[SideLandmarks] = []
@@ -79,7 +82,20 @@ def select_body_side(
         )
 
     candidates_by_side = {candidate.side: candidate for candidate in candidates}
-    best = max(candidates, key=lambda candidate: candidate.visibility)
+    filtered_candidates = candidates
+    if min_point_visibility is not None:
+        filtered_candidates = [
+            candidate
+            for candidate in candidates
+            if all(
+                point_visibility(candidate.points[point_name]) >= min_point_visibility
+                for point_name in required_point_names
+            )
+        ]
+    if not filtered_candidates:
+        filtered_candidates = candidates
+
+    best = max(filtered_candidates, key=lambda candidate: candidate.visibility)
     if best.visibility < min_visibility:
         return None
 
@@ -87,6 +103,11 @@ def select_body_side(
         preferred = candidates_by_side[preferred_side]
         visibility_gap = best.visibility - preferred.visibility
         if preferred.visibility >= min_visibility and visibility_gap <= side_switch_margin:
+            if min_point_visibility is not None and any(
+                point_visibility(preferred.points[point_name]) < min_point_visibility
+                for point_name in required_point_names
+            ):
+                return best
             return preferred
     return best
 

@@ -46,3 +46,6 @@ app/static/*
 # Output files
 output/
 *.tmp
+
+# Local datasets
+dataset/

@@ -46,6 +46,3 @@ app/static/*
 # Output files
 output/
 *.tmp
-
-dataset/
-.dataset/

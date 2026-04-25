@@ -34,6 +34,16 @@ def _safe_target_reps(value) -> int:
         return 10
 
 
+def _safe_optional_target_reps(value) -> int | None:
+    try:
+        if value in {"", None, "null", "None"}:
+            return None
+        target_reps = int(value)
+        return target_reps if target_reps > 0 else None
+    except (TypeError, ValueError):
+        return None
+
+
 def _summarize_history(history: list[dict]) -> tuple[int, int, str]:
     good_reps = sum(1 for rep in history if rep.get("status") == "benar")
     bad_reps = sum(1 for rep in history if rep.get("status") == "salah")
@@ -74,7 +84,7 @@ def _estimate_video_duration_seconds(video_path: Path) -> int:
 def _build_backend_session_summary(
     *,
     exercise_type: str,
-    target_reps: int,
+    target_reps: int | None,
     file_name: str,
     runtime_result: dict,
 ) -> dict:
@@ -101,7 +111,7 @@ def _build_backend_session_summary(
             "noPoseRate": runtime_result.get("no_pose_rate", 0.0),
             "lowVisibilityRate": runtime_result.get("low_visibility_rate", 0.0),
             "invalidViewRate": runtime_result.get("invalid_view_rate", 0.0),
-            "tooFarRate": None,
+            "tooFarRate": runtime_result.get("too_far_rate", 0.0),
             "inferenceErrors": 0,
             "processingSeconds": runtime_result.get("processing_seconds", 0.0),
         },
@@ -213,7 +223,7 @@ def process_uploaded_video():
     if exercise_type not in EXERCISE_TYPES:
         return jsonify({"error": f"Invalid exercise type: {exercise_type}"}), 400
 
-    target_reps = _safe_target_reps(request.form.get("target_reps", 10))
+    target_reps = _safe_optional_target_reps(request.form.get("target_reps"))
     temp_path = None
     try:
         suffix = Path(secure_filename(uploaded_file.filename)).suffix or ".mp4"
@@ -224,7 +234,7 @@ def process_uploaded_video():
         runtime_result = run_video_session(
             temp_path,
             exercise_type=exercise_type,
-            max_reps=target_reps,
+            max_reps=None,
             draw_pose=False,
         )
         session_summary = _build_backend_session_summary(

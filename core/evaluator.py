@@ -5,7 +5,14 @@ import re
 from pathlib import Path
 
 import numpy as np
-from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_score, recall_score
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    precision_recall_fscore_support,
+    precision_score,
+    recall_score,
+)
 
 try:
     import matplotlib
@@ -28,11 +35,27 @@ def evaluate_model(y_true, y_pred, title="MODEL", output_dir="artifacts/evaluati
 
     cm = confusion_matrix(y_true, y_pred, labels=labels)
     label_support = {label: int(sum(1 for value in y_true if value == label)) for label in labels}
+    per_label_metrics = {}
+    if y_true:
+        precision_values, recall_values, f1_values, support_values = precision_recall_fscore_support(
+            y_true,
+            y_pred,
+            labels=labels,
+            zero_division=0,
+        )
+        for index, label in enumerate(labels):
+            per_label_metrics[label] = {
+                "precision": float(round(precision_values[index], 4)),
+                "recall": float(round(recall_values[index], 4)),
+                "f1": float(round(f1_values[index], 4)),
+                "support": int(support_values[index]),
+            }
     metrics = {
         "title": title,
         "samples": len(y_true),
         "labels": labels,
         "label_support": label_support,
+        "per_label_metrics": per_label_metrics,
         "confusion_matrix": cm.tolist(),
         "accuracy": accuracy_score(y_true, y_pred) if y_true else 0.0,
         "precision": precision_score(y_true, y_pred, pos_label="benar", zero_division=0) if y_true else 0.0,
@@ -53,6 +76,13 @@ def evaluate_model(y_true, y_pred, title="MODEL", output_dir="artifacts/evaluati
     print(f"Precision : {metrics['precision']:.2f}")
     print(f"Recall    : {metrics['recall']:.2f}")
     print(f"F1 Score  : {metrics['f1']:.2f}")
+    if metrics["per_label_metrics"]:
+        print("\nPer-label metrics:")
+        for label, values in metrics["per_label_metrics"].items():
+            print(
+                f"  {label:>5} -> P {values['precision']:.2f} | R {values['recall']:.2f} | "
+                f"F1 {values['f1']:.2f} | support {values['support']}"
+            )
 
     slug = slugify(title)
     png_path = output_dir / f"{slug}_confusion_matrix.png"

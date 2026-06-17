@@ -191,6 +191,8 @@ def main():
     print(f"  Dataset audit: {python_cmd} scripts/dataset_audit.py")
     print(f"  Eval push-up : {python_cmd} scripts/evaluate_pushup.py")
     print(f"  Eval squat   : {python_cmd} scripts/evaluate_squat.py")
+    print(f"  Live push-up : {python_cmd} scripts/pushup_counter.py")
+    print(f"  Live squat   : {python_cmd} scripts/squat_counter.py")
     if missing_optional:
         print("\nOptional packages still missing for evaluation/artifacts:")
         print(f"  {', '.join(missing_optional)}")

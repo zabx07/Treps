@@ -17,6 +17,7 @@ class ExerciseConfig:
     label: str
     required_points: list[str]
     optional_points: list[str]
+    error_catalog: list[dict]
     default_feedback: str
     top_angle: float
     bottom_angle: float
@@ -28,8 +29,10 @@ class ExerciseConfig:
     stage_down_feedback: str
     body_alignment_threshold: float | None = None
     head_drop_threshold: float | None = None
+    head_drop_min_main_angle_threshold: float | None = None
     torso_lean_threshold: float | None = None
     knee_forward_ratio_threshold: float | None = None
+    heel_lift_ratio_threshold: float | None = None
 
 
 EXERCISE_CONFIGS = {
@@ -55,9 +58,9 @@ class ExerciseSession:
         self._rolling_values: dict[str, deque[float]] = {}
         self.reset()
 
-    def reset(self, target_reps: int = 10):
+    def reset(self, target_reps: int | None = 10):
         self.rep_count = 0
-        self.target_reps = max(1, int(target_reps))
+        self.target_reps = None if target_reps in {None, 0} else max(1, int(target_reps))
         self.position = None
         self.stage = "unknown"
         self.last_status = "-"
@@ -76,6 +79,7 @@ class ExerciseSession:
             "head_drop": deque(maxlen=config.ANGLE_SMOOTHING_WINDOW),
             "torso_lean": deque(maxlen=config.ANGLE_SMOOTHING_WINDOW),
             "knee_forward_ratio": deque(maxlen=config.ANGLE_SMOOTHING_WINDOW),
+            "heel_lift_ratio": deque(maxlen=config.ANGLE_SMOOTHING_WINDOW),
             "lateral_ratio": deque(maxlen=config.LATERAL_RATIO_SMOOTHING_WINDOW),
             "torso_ratio": deque(maxlen=config.LATERAL_RATIO_SMOOTHING_WINDOW),
         }
@@ -103,6 +107,7 @@ class ExerciseSession:
             optional_point_names=self.config.optional_points,
             preferred_side=self.last_selected_side,
             side_switch_margin=config.SIDE_SWITCH_VISIBILITY_MARGIN,
+            min_point_visibility=config.LANDMARK_MIN_POINT_VISIBILITY_THRESHOLD,
         )
         if side is None:
             self.stage = "low_visibility"
@@ -210,11 +215,13 @@ class ExerciseSession:
             "max_head_drop": 0.0,
             "max_torso_lean": 0.0,
             "max_knee_forward_ratio": 0.0,
+            "max_heel_lift_ratio": 0.0,
             "frame_count": 0,
             "body_alignment_violations": 0,
             "head_drop_violations": 0,
             "torso_lean_violations": 0,
             "knee_forward_violations": 0,
+            "heel_lift_violations": 0,
         }
 
     def _smooth(self, key: str, value: float) -> float:
@@ -257,6 +264,9 @@ class ExerciseSession:
         self._rep_metrics["max_knee_forward_ratio"] = max(
             self._rep_metrics["max_knee_forward_ratio"], smoothed["knee_forward_ratio"]
         )
+        self._rep_metrics["max_heel_lift_ratio"] = max(
+            self._rep_metrics["max_heel_lift_ratio"], smoothed["heel_lift_ratio"]
+        )
         if (
             self.config.body_alignment_threshold is not None
             and smoothed["body_angle"] < self.config.body_alignment_threshold
@@ -277,6 +287,11 @@ class ExerciseSession:
             and smoothed["knee_forward_ratio"] > self.config.knee_forward_ratio_threshold
         ):
             self._rep_metrics["knee_forward_violations"] += 1
+        if (
+            self.config.heel_lift_ratio_threshold is not None
+            and smoothed["heel_lift_ratio"] > self.config.heel_lift_ratio_threshold
+        ):
+            self._rep_metrics["heel_lift_violations"] += 1
 
     def _update_position(self, main_angle: float):
         raw_position = None
@@ -320,16 +335,30 @@ class ExerciseSession:
             ear_point = side.points.get("ear")
             head_drop = 0.0
             if ear_point is not None:
-                head_drop = max(0.0, ear_point.y - side.points["shoulder"].y)
+                head_drop = safe_ratio(
+                    abs(ear_point.y - side.points["shoulder"].y),
+                    abs(side.points["shoulder"].y - side.points["hip"].y),
+                    default=1.0,
+                )
             return {
                 "main_angle": calculate_angle(shoulder, elbow, wrist),
                 "body_angle": calculate_angle(shoulder, hip, ankle),
                 "head_drop": head_drop,
                 "torso_lean": 0.0,
                 "knee_forward_ratio": 0.0,
+                "heel_lift_ratio": 0.0,
             }
 
         knee = (side.points["knee"].x, side.points["knee"].y)
+        heel_point = side.points.get("heel")
+        foot_index_point = side.points.get("foot_index")
+        heel_lift_ratio = 0.0
+        if heel_point is not None and foot_index_point is not None:
+            heel_lift_ratio = safe_ratio(
+                max(0.0, foot_index_point.y - heel_point.y),
+                abs(side.points["hip"].y - side.points["ankle"].y),
+                default=0.0,
+            )
         return {
             "main_angle": calculate_angle(hip, knee, ankle),
             "body_angle": 180.0,
@@ -340,10 +369,17 @@ class ExerciseSession:
                 abs(hip[0] - ankle[0]),
                 default=0.0,
             ),
+            "heel_lift_ratio": heel_lift_ratio,
         }
 
+    def _error_label(self, error_code: str) -> str:
+        for item in self.config.error_catalog:
+            if item["code"] == error_code:
+                return item["label"]
+        return error_code
+
     def _finalize_rep(self):
-        passed, message, metrics = self._evaluate_rep()
+        passed, message, metrics, error_codes, error_labels = self._evaluate_rep()
         self.rep_count += 1
         self.last_status = "Benar" if passed else "Salah"
         self.feedback = message
@@ -352,75 +388,93 @@ class ExerciseSession:
                 "rep": self.rep_count,
                 "status": "benar" if passed else "salah",
                 "detail": message,
+                "error_codes": error_codes,
+                "error_labels": error_labels,
+                "primary_error_code": error_codes[0] if error_codes else None,
                 "metrics": metrics,
             }
         )
-        if self.rep_count >= self.target_reps:
+        if self.target_reps is not None and self.rep_count >= self.target_reps:
             self.completed = True
 
     def _evaluate_rep(self):
         frame_count = max(self._rep_metrics["frame_count"], 1)
         violation_threshold = config.FORM_VIOLATION_RATIO_THRESHOLD
         if self.config.exercise_type == "push_up":
-            errors = []
+            error_codes = []
             if self._rep_metrics["min_main_angle"] > self.config.rom_threshold:
-                errors.append("Push-up kurang dalam")
+                error_codes.append("tidak_full_rom")
             if (
                 self.config.body_alignment_threshold is not None
                 and self._rep_metrics["body_alignment_violations"] / frame_count
                 >= violation_threshold
             ):
-                errors.append("Postur tubuh tidak lurus")
+                error_codes.append("badan_bungkuk")
             if (
                 self.config.head_drop_threshold is not None
-                and self._rep_metrics["head_drop_violations"] / frame_count
-                >= violation_threshold
+                and self.config.head_drop_min_main_angle_threshold is not None
+                and self._rep_metrics["max_head_drop"] >= self.config.head_drop_threshold
+                and self._rep_metrics["min_main_angle"]
+                >= self.config.head_drop_min_main_angle_threshold
             ):
-                errors.append("Kepala terlalu menunduk")
+                error_codes.append("traps_naik")
             metrics = {
                 "min_elbow_angle": round(self._rep_metrics["min_main_angle"], 2),
                 "min_body_angle": round(self._rep_metrics["min_body_angle"], 2),
-                "max_head_drop": round(self._rep_metrics["max_head_drop"], 4),
+                "max_traps_raise_ratio": round(self._rep_metrics["max_head_drop"], 4),
                 "form_violation_ratio": round(
                     self._rep_metrics["body_alignment_violations"] / frame_count, 4
                 ),
-                "head_drop_violation_ratio": round(
+                "traps_raise_violation_ratio": round(
                     self._rep_metrics["head_drop_violations"] / frame_count, 4
                 ),
+                "frame_count": frame_count,
             }
         else:
-            errors = []
+            error_codes = []
             if self._rep_metrics["min_main_angle"] > self.config.rom_threshold:
-                errors.append("Squat kurang dalam")
+                error_codes.append("tidak_full_rom")
             if (
                 self.config.torso_lean_threshold is not None
                 and self._rep_metrics["torso_lean_violations"] / frame_count
                 >= violation_threshold
             ):
-                errors.append("Badan terlalu condong ke depan")
+                error_codes.append("badan_bungkuk")
             if (
                 self.config.knee_forward_ratio_threshold is not None
                 and self._rep_metrics["knee_forward_violations"] / frame_count
                 >= violation_threshold
             ):
-                errors.append("Lutut terlalu maju")
+                error_codes.append("lutut_maju")
+            if (
+                self.config.heel_lift_ratio_threshold is not None
+                and self._rep_metrics["heel_lift_violations"] / frame_count
+                >= violation_threshold
+            ):
+                error_codes.append("kaki_jinjit")
             metrics = {
                 "min_knee_angle": round(self._rep_metrics["min_main_angle"], 2),
                 "max_torso_lean": round(self._rep_metrics["max_torso_lean"], 2),
                 "max_knee_forward_ratio": round(
                     self._rep_metrics["max_knee_forward_ratio"], 4
                 ),
+                "max_heel_lift_ratio": round(self._rep_metrics["max_heel_lift_ratio"], 4),
                 "torso_lean_violation_ratio": round(
                     self._rep_metrics["torso_lean_violations"] / frame_count, 4
                 ),
                 "knee_forward_violation_ratio": round(
                     self._rep_metrics["knee_forward_violations"] / frame_count, 4
                 ),
+                "heel_lift_violation_ratio": round(
+                    self._rep_metrics["heel_lift_violations"] / frame_count, 4
+                ),
+                "frame_count": frame_count,
             }
 
-        if errors:
-            return False, " | ".join(errors), metrics
-        return True, "Teknik benar", metrics
+        error_labels = [self._error_label(error_code) for error_code in error_codes]
+        if error_labels:
+            return False, " | ".join(error_labels), metrics, error_codes, error_labels
+        return True, "Teknik benar", metrics, [], []
 
     def _draw_pose(self, frame, results):
         self.mp_draw.draw_landmarks(

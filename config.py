@@ -113,11 +113,12 @@ POSE_MIN_DETECTION_CONFIDENCE = 0.6
 POSE_MIN_TRACKING_CONFIDENCE = 0.6
 POSE_MIN_PRESENCE_CONFIDENCE = 0.5
 LANDMARK_VISIBILITY_THRESHOLD = 0.55
+LANDMARK_MIN_POINT_VISIBILITY_THRESHOLD = 0.35
 ANGLE_SMOOTHING_WINDOW = 6
 LATERAL_RATIO_SMOOTHING_WINDOW = 4
 STATE_STABLE_FRAMES = 3
 MIN_REP_WINDOW_FRAMES = 6
-FORM_VIOLATION_RATIO_THRESHOLD = 0.34
+FORM_VIOLATION_RATIO_THRESHOLD = 0.25
 SIDE_VIEW_REQUIRED = True
 SIDE_VIEW_MAX_LATERAL_RATIO = 0.45
 SIDE_SWITCH_VISIBILITY_MARGIN = 0.08
@@ -185,15 +186,17 @@ SQUAT_BOTTOM_ANGLE = 95
 SQUAT_TRACK_START_ANGLE = 145
 SQUAT_ROM_THRESHOLD = 98
 SQUAT_TORSO_LEAN_THRESHOLD = 58
-SQUAT_KNEE_FORWARD_RATIO = 0.78
+SQUAT_KNEE_FORWARD_RATIO = None
+SQUAT_HEEL_LIFT_RATIO_THRESHOLD = 10.0
 
 # ================= PUSH-UP =================
 PUSHUP_TOP_ANGLE = 165
 PUSHUP_BOTTOM_ANGLE = 95
 PUSHUP_TRACK_START_ANGLE = 145
-PUSHUP_ROM_THRESHOLD = 108
+PUSHUP_ROM_THRESHOLD = 90
 PUSHUP_BODY_ALIGNMENT_THRESHOLD = 160
-PUSHUP_HEAD_DROP_THRESHOLD = 0.16
+PUSHUP_TRAPS_RAISE_RATIO_THRESHOLD = 2.5
+PUSHUP_TRAPS_MIN_ELBOW_ANGLE = 70
 
 # ================= FEEDBACK =================
 MISSING_POSE_FEEDBACK = "Pose tidak terdeteksi. Pastikan seluruh tubuh terlihat."
@@ -211,6 +214,7 @@ WEB_RUNTIME_GLOBAL_CONFIG = {
     "pose_min_tracking_confidence": POSE_MIN_TRACKING_CONFIDENCE,
     "pose_min_presence_confidence": POSE_MIN_PRESENCE_CONFIDENCE,
     "landmark_visibility_threshold": LANDMARK_VISIBILITY_THRESHOLD,
+    "landmark_min_point_visibility_threshold": LANDMARK_MIN_POINT_VISIBILITY_THRESHOLD,
     "angle_smoothing_window": ANGLE_SMOOTHING_WINDOW,
     "lateral_ratio_smoothing_window": LATERAL_RATIO_SMOOTHING_WINDOW,
     "state_stable_frames": STATE_STABLE_FRAMES,
@@ -271,29 +275,42 @@ EXERCISE_RUNTIME_CONFIGS = {
         "track_start_angle": PUSHUP_TRACK_START_ANGLE,
         "rom_threshold": PUSHUP_ROM_THRESHOLD,
         "body_alignment_threshold": PUSHUP_BODY_ALIGNMENT_THRESHOLD,
-        "head_drop_threshold": PUSHUP_HEAD_DROP_THRESHOLD,
+        "head_drop_threshold": PUSHUP_TRAPS_RAISE_RATIO_THRESHOLD,
+        "head_drop_min_main_angle_threshold": PUSHUP_TRAPS_MIN_ELBOW_ANGLE,
         "default_feedback": "Siapkan posisi plank dari samping kamera.",
         "ready_pose_feedback": "Mulai dari plank penuh agar repetisi dihitung dengan benar.",
         "stage_up_feedback": "Turunkan badan secara terkendali.",
         "stage_mid_feedback": "Jaga tubuh tetap lurus saat turun.",
         "stage_down_feedback": "Dorong kembali ke posisi plank.",
+        "error_catalog": [
+            {"code": "tidak_full_rom", "label": "Tidak full ROM"},
+            {"code": "badan_bungkuk", "label": "Badan tidak lurus"},
+            {"code": "traps_naik", "label": "Bahu/trapezius terlalu naik"},
+        ],
     },
     "squat": {
         "exercise_type": "squat",
         "label": "Squat",
         "required_points": ["shoulder", "hip", "knee", "ankle"],
-        "optional_points": [],
+        "optional_points": ["heel", "foot_index"],
         "top_angle": SQUAT_TOP_ANGLE,
         "bottom_angle": SQUAT_BOTTOM_ANGLE,
         "track_start_angle": SQUAT_TRACK_START_ANGLE,
         "rom_threshold": SQUAT_ROM_THRESHOLD,
         "torso_lean_threshold": SQUAT_TORSO_LEAN_THRESHOLD,
         "knee_forward_ratio_threshold": SQUAT_KNEE_FORWARD_RATIO,
+        "heel_lift_ratio_threshold": SQUAT_HEEL_LIFT_RATIO_THRESHOLD,
         "default_feedback": "Siapkan posisi berdiri menyamping kamera.",
         "ready_pose_feedback": "Mulai dari posisi berdiri tegak sebelum turun.",
         "stage_up_feedback": "Turunkan pinggul ke belakang.",
         "stage_mid_feedback": "Jaga dada terbuka dan lutut stabil.",
         "stage_down_feedback": "Dorong kembali ke posisi berdiri.",
+        "error_catalog": [
+            {"code": "tidak_full_rom", "label": "Depth kurang / tidak full ROM"},
+            {"code": "badan_bungkuk", "label": "Badan terlalu condong ke depan"},
+            {"code": "lutut_maju", "label": "Lutut terlalu maju"},
+            {"code": "kaki_jinjit", "label": "Tumit terangkat / kaki jinjit"},
+        ],
     },
 }
 
@@ -319,4 +336,4 @@ KNEE_FORWARD_RATIO = SQUAT_KNEE_FORWARD_RATIO
 ELBOW_DOWN = PUSHUP_BOTTOM_ANGLE
 ELBOW_UP = PUSHUP_TOP_ANGLE
 BODY_ALIGNMENT_THRESHOLD = PUSHUP_BODY_ALIGNMENT_THRESHOLD
-HEAD_DROP_THRESHOLD = PUSHUP_HEAD_DROP_THRESHOLD
+HEAD_DROP_THRESHOLD = PUSHUP_TRAPS_RAISE_RATIO_THRESHOLD
